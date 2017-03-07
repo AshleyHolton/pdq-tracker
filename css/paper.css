@@ -1,0 +1,43 @@
+@page
+{
+	size: A4;
+	margin: 10mm;
+}
+
+.sheet
+{
+	margin: 0;
+	overflow: hidden;
+	position: relative;
+	box-sizing: border-box;
+	page-break-after: always;
+	width: 210mm;
+	font: 15px arial, sans-serif;
+}
+
+table
+{
+	font-size: 12px;
+	width: 100%;
+	border: 1px solid #000000;
+	margin-bottom: 20px;
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+		
+tr, td, th
+{
+	border: 1px solid #000000;
+	padding: 5px;
+}
+
+@media screen
+{	
+	.sheet
+	{
+		background: #ffffff;
+		box-shadow: 0 .5mm 2mm rgba(0,0,0,.3);
+		margin: 0 auto;
+		padding: 10mm;
+	}
+}
