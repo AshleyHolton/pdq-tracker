@@ -66,8 +66,8 @@ class PDQ_Tracker
 		
 		if(current_user_can('update_plugins'))
 		{
-			require_once(trailingslashit(plugin_dir_path(__FILE__)) . 'includes/updater.php');
-			$updater = new PDQTrackerUpdater(__FILE__);
+			require_once(trailingslashit(plugin_dir_path(__FILE__)) . 'includes/updater.class.php');
+			$updater = new Updater(__FILE__);
 		}
 		
 		if(class_exists('User_Role_Editor'))
