@@ -18,25 +18,25 @@ class Customer_Details_Box extends PDQ_Box
 					<tr valign="top">
 						<th scope="row"><label for="customer_name">Customer Name *</label></th>
 						<td>
-							<input type="text" id="customer_name" name="customer_name" value="<?php echo isset($pdq->customer_name) ? $pdq->customer_name : ''; ?>" />
+							<input type="text" id="customer_name" name="customer_name" minlength="2" value="<?php echo isset($pdq->customer_name) ? $pdq->customer_name : ''; ?>" required />
 						</td>
 					</tr>
 					<tr valign="top">
 						<th scope="row"><label for="customer_address">Customer Address *</label></th>
 						<td>
-							<input type="text" id="customer_address" name="customer_address" value="<?php echo isset($pdq->customer_address) ? $pdq->customer_address : ''; ?>" />
+							<input type="text" id="customer_address" name="customer_address" minlength="5" value="<?php echo isset($pdq->customer_address) ? $pdq->customer_address : ''; ?>" required />
 						</td>
 					</tr>
 					<tr valign="top">
 						<th scope="row"><label for="customer_telephone">Customer Telephone Number *</label></th>
 						<td>
-							<input type="text" id="customer_telephone" name="customer_telephone" value="<?php echo isset($pdq->customer_telephone) ? $pdq->customer_telephone : ''; ?>" />
+							<input type="text" id="customer_telephone" name="customer_telephone" minlength="10" value="<?php echo isset($pdq->customer_telephone) ? $pdq->customer_telephone : ''; ?>" required />
 						</td>
 					</tr>
 					<tr valign="top">
 						<th scope="row"><label for="customer_dob">Customer Date of Birth *</label></th>
 						<td>
-							<input type="text" id="customer_dob" name="customer_dob" value="<?php echo isset($pdq->customer_dob) ? date('d-m-Y', strtotime($pdq->customer_dob)) : ''; ?>" />
+							<input type="text" id="customer_dob" name="customer_dob" value="<?php echo isset($pdq->customer_dob) ? date('d-m-Y', strtotime($pdq->customer_dob)) : ''; ?>" required />
 						</td>
 					</tr>
 				</tbody>
@@ -108,5 +108,20 @@ class Customer_Details_Box extends PDQ_Box
 		$newdata['customer_address'] = $customer_address;
 		$newdata['customer_telephone'] = $customer_telephone;
 		$newdata['customer_dob'] = $customer_dob;
+	}
+	
+	public function footer_script()
+	{
+		echo '$("#customer_name").rules("add", {"minlength": 6, "required": true});';
+		echo '$("#customer_address").rules("add", {"minlength": 6, "required": true});';
+		echo '$("#customer_telephone").rules("add", {"minlength": 6, "required": true, "number": true});';
+		echo '$("#customer_dob").rules("add", {"required": true, "date": true});';
+		
+		echo '$("#customer_dob").datepicker({
+				dateFormat: "dd-mm-yy",
+				defaultDate: "01-01-1990",
+				changeYear: true,
+				yearRange: "c-80:c"
+		});';
 	}
 }

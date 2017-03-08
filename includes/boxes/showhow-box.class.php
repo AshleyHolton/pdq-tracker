@@ -79,4 +79,18 @@ class ShowHow_Box extends PDQ_Box
 			}
 		}
 	}
+	
+	public function footer_script()
+	{
+		echo '$("#showhow_date").rules("add", {"date": true, "required": function(element){
+				return $("#showhow_time").val().length > 0;
+		}});';
+		echo '$("#showhow_time").rules("add", {"required": function(element){
+				return $("#showhow_date").val().length > 0;
+		}});';
+		
+		echo '$("#showhow_date").datepicker({
+				dateFormat: "dd-mm-yy",
+		});';
+	}
 }

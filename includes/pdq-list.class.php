@@ -37,8 +37,8 @@ class PDQ_Entries_List extends WP_List_Table
 
 		$customer_name = sprintf('<strong><a href="?page=%s&pdq=%s&action=print" target="_blank" id="%3$s" class="print-pdq">%s</a></strong>', $_GET['page'], $item['id'], $item['customer_name']);
 		$actions['edit'] = sprintf('<a href="?page=%s&action=%s&pdq=%s" id="%3$s" class="view-pdq">%s</a>', $_GET['page'], 'edit', $item['id'], __('Edit', 'pdq-tracker'));
-
-		$actions['delete'] = sprintf('<a href="%s&action=%s&pdq=%s" id="%3$s" class="view-pdq">%s</a>', wp_nonce_url(admin_url('admin.php?page=pdq-tracker'), 'delete-pdq-' . $item['id']), 'delete_pdq', $item['id'], __('Delete', 'pdq-tracker'));
+ 
+		$actions['delete'] = sprintf('<a href="%s&action=%s&pdq=%s" id="%3$s" class="view-pdq" onclick="return confirm(\'Are you sure?\')">%s</a>', wp_nonce_url(admin_url('admin.php?page=pdq-tracker'), 'delete-pdq-' . $item['id']), 'delete_pdq', $item['id'], __('Delete', 'pdq-tracker'));
 
 		return sprintf('%1$s %2$s', $customer_name, $this->row_actions($actions));
 	}

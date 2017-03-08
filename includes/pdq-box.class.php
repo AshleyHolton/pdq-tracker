@@ -17,6 +17,7 @@ class PDQ_Box
 	public function meta_box($pdq){}
 	protected function print_box($pdq){}
 	public function save_box(&$newdata, &$validation_errors){}
+	public function footer_script(){}
 	
 	public function register_meta_box()
 	{

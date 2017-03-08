@@ -71,7 +71,7 @@ class Store_Information_Box extends PDQ_Box
 				$items_html .= '
 				<tr valign="top">
 					<td>
-						<input type="text" id="left_item[]" name="left_item[]" value="' . $key . '" placeholder="Item Name" />
+						<input type="text" class="left-item" id="left_item[]" name="left_item[]" value="' . $key . '" placeholder="Item Name" />
 					</td>
 					<td>
 						<a href="#" class="remove_field">Remove</a>
@@ -173,5 +173,35 @@ class Store_Information_Box extends PDQ_Box
 		$items_left_behind = isset($_POST['left_item']) ? json_encode(array_map('esc_html', $_POST['left_item'])) : json_encode(array());
 		
 		$newdata['items_left'] = $items_left_behind;
+	}
+	
+	public function footer_script()
+	{
+		echo '$("#receipt_number").rules("add", {"minlength": 6, "maxlength": 6, "required": true, "number": true});';
+		echo '$.validator.addClassRules("left-item", { required: true });';
+		
+		echo '
+		
+		//Add Items Left Behind
+		var max_items_left = 20;
+		var items_left_wrapper = $(".left-items-table");
+		var existing_items = $(".left-items-table tr").length;
+		var add_item_left_button = $(".add_new_left_item");
+		var numberIncr = existing_items;
+
+		$(add_item_left_button).click(function (e) {
+			e.preventDefault();
+			if ($(".left-items-table tr").length < max_items_left) {
+				$(items_left_wrapper).append(\'<tr valign="top"><td><input type="text" class="left-item" style="width: 100%;" id="left_item[\' + numberIncr + \']" name="left_item[\' + numberIncr + \']" placeholder="Item Name" /></td><td><a href="#" class="remove_field" style="width: 100%;">Remove</a></td></tr>\');
+				numberIncr++;
+			}
+		});
+
+		$(items_left_wrapper).on("click", ".remove_field", function (e) {
+			e.preventDefault();
+			$(this).closest("tr").remove();
+		});
+	
+	';
 	}
 }

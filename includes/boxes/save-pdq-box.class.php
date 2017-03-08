@@ -26,7 +26,7 @@ class Save_PDQ_Box extends PDQ_Box
 			else
 			{
 				echo sprintf('<a href="%s&action=%s&pdq=%s" id="%3$s" class="button">%s</a>', wp_nonce_url(admin_url('admin.php?page=pdq-tracker'), 'incomplete-pdq-' . $pdq->id), 'incomplete_pdq', $pdq->id, 'Edit');
-				echo sprintf('<a href="%s&action=%s&pdq=%s" id="%3$s" class="button">%s</a>', wp_nonce_url(admin_url('admin.php?page=pdq-tracker'), 'delete-pdq-' . $pdq->id), 'delete_pdq', $pdq->id, 'Delete');
+				echo sprintf('<a href="%s&action=%s&pdq=%s" id="%3$s" class="button" onclick="return confirm(\'Are you sure?\')">%s</a>', wp_nonce_url(admin_url('admin.php?page=pdq-tracker'), 'delete-pdq-' . $pdq->id), 'delete_pdq', $pdq->id, 'Delete');
 			}
 		}
 		else

@@ -25,6 +25,8 @@ class Customer_Emails_Box extends PDQ_Box
 		
 		if($pdq)
 		{
+			$i = 0;
+			
 			$emails = json_decode($pdq->customer_email, true);
 			foreach($emails as $email)
 			{
@@ -43,14 +45,14 @@ class Customer_Emails_Box extends PDQ_Box
 					
 					<tr valign="top">
 						<td>
-							<input type="email" id="customer_email_address[]" name="customer_email_address[]" value="<?php echo $email_array[0]; ?>" placeholder="Email Address" />
+							<input type="email" class="customer-email" id="customer_email_address[<?php echo $i; ?>]" name="customer_email_address[<?php echo $i; ?>]" value="<?php echo $email_array[0]; ?>" placeholder="Email Address" />
 						</td>
 						<td>
-							<input type="text" id="customer_email_password[]" name="customer_email_password[]" value="<?php echo $email_array[1]; ?>" placeholder="Password" />
+							<input type="text" class="customer-email-password" id="customer_email_password" name="customer_email_password[<?php echo $i; ?>]" value="<?php echo $email_array[1]; ?>" placeholder="Password" />
 						</td>
 						<td>
-							<input type="hidden" id="customer_email_create[]" name="customer_email_create[]" value="off">
-							<p>Create? <input type="checkbox" id="customer_email_create[]" name="customer_email_create[]" value="on" <?php echo $checked; ?> /></p>
+							<input type="hidden" id="customer_email_create" name="customer_email_create[<?php echo $i; ?>]" value="off">
+							<p>Create? <input type="checkbox" id="customer_email_create" name="customer_email_create[<?php echo $i; ?>]" value="on" <?php echo $checked; ?> /></p>
 						</td>
 						<td>
 							<a href="#" class="remove_field">Remove</a>
@@ -58,6 +60,8 @@ class Customer_Emails_Box extends PDQ_Box
 					</tr>
 					
 					<?php
+					
+					$i++;
 				}
 			}
 		}
@@ -160,5 +164,33 @@ class Customer_Emails_Box extends PDQ_Box
 		{
 			$newdata['customer_email'] = json_encode(array());
 		}
+	}
+	
+	public function footer_script()
+	{
+		echo '
+			$.validator.addClassRules("customer-email", { required: true, email: true });
+			$.validator.addClassRules("customer-email-password", { required: true });
+			
+			//Add Customer Emails
+			var max_emails = 10;
+			var emails_wrapper = $(".customer-email-table");
+			var existing_emails = $(".customer-email-table tr").length;
+			var add_email_button = $(".add_new_email");
+			var numberIncr = existing_emails;
+
+			$(add_email_button).click(function (e) {
+				e.preventDefault();
+				if ($(".customer-email-table tr").length < max_emails) {
+					$(emails_wrapper).append(\'<tr valign="top"><td><input type="email" class="customer-email" id="customer_email_address[\' + numberIncr + \']" name="customer_email_address[\' + numberIncr + \']" placeholder="Email Address" /></td><td><input type="text" class="customer-email-password" id="customer_email_password[\' + numberIncr + \']" name="customer_email_password[\' + numberIncr + \']" placeholder="Password" /></td><td><input type="hidden" id="customer_email_create[\' + numberIncr + \']" name="customer_email_create[\' + numberIncr + \']" value="off">Create? <input type="checkbox" id="customer_email_create[\' + numberIncr + \']" name="customer_email_create[\' + numberIncr + \']" value="on" /></td><td><a href="#" class="remove_field">Remove</a></td></tr>\');
+					numberIncr++;
+				}
+			});
+
+			$(emails_wrapper).on("click", ".remove_field", function (e) {
+				e.preventDefault();
+				$(this).closest("tr").remove();
+			});		
+		';
 	}
 }

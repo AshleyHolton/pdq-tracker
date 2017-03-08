@@ -24,41 +24,49 @@ class Software_Box extends PDQ_Box
 		if($pdq)
 		{
 			$softwares = json_decode($pdq->software, true);
+			
+			$i = 0;
 
 			foreach($softwares as $key => $value)
 			{
 				$software_html .= '
 				<tr valign="top">
 					<td>
-						<input type="text" id="software[]" name="software[]" value="' . $key . '" placeholder="Email Address" />
+						<input type="text" class="software-name" id="software[' . $i . ']" name="software[' . $i . ']" value="' . $key . '" placeholder="Email Address" />
 					</td>
 					<td>
-						<input type="number" id="software_quantity[]" name="software_quantity[]" min="1" max="10" value="' . $value . '" />
+						<input type="number" class="software-quantity" id="software_quantity[' . $i . ']" name="software_quantity[' . $i . ']" min="1" max="10" value="' . $value . '" />
 					</td>
 					<td>
 						<a href="#" class="remove_field">Remove</a>
 					</td>
 				</tr>';
+				
+				$i++;
 			}
 		}
 		else
 		{
 			$meta_defaults = $this->{'software_default_' . $pdq_tracker->current_setup_type};
+			
+			$i = 0;
 
 			foreach($meta_defaults as $key)
 			{
 				$software_html .= '
 				<tr valign="top">
 					<td>
-						<input type="text" id="software[]" name="software[]" value="' . $key . '" placeholder="Software Name" />
+						<input type="text" class="software-name "id="software[' . $i . ']" name="software[' . $i . ']" value="' . $key . '" placeholder="Software Name" />
 					</td>
 					<td>
-						<input type="number" id="software_quantity[]" name="software_quantity[]" min="1" max="10" value="1" />
+						<input type="number" class="software-quantity "id="software_quantity[' . $i . ']" name="software_quantity[' . $i . ']" min="1" max="10" value="1" />
 					</td>
 					<td>
 						<a href="#" class="remove_field">Remove</a>
 					</td>
 				</tr>';
+				
+				$i++;
 			}
 		}
 		?>
@@ -128,5 +136,33 @@ class Software_Box extends PDQ_Box
 		{
 			$newdata['software'] = json_encode(array());
 		}
+	}
+	
+	public function footer_script()
+	{
+		echo '
+			$.validator.addClassRules("software-name", { required: true });
+			$.validator.addClassRules("software-quantity", { required: true, number: true });
+			
+			//Add Software
+			var max_software = 20;
+			var software_wrapper = $(".software-table");
+			var existing_software = $(".software-table tr").length;
+			var add_software_button = $(".add_new_software");
+			var numberIncr = existing_software;
+
+			$(add_software_button).click(function (e) {
+				e.preventDefault();
+				if ($(".software-table tr").length < max_software) {
+					$(software_wrapper).append(\'<tr valign="top"><td><input type="text" class="software-name" style="width: 100%;" id="software[\' + numberIncr + \']" name="software[\' + numberIncr + \']" placeholder="Software Name" /></td><td><input type="number" class="software-quantity" style="width: 100%;" id="software_quantity[\' + numberIncr + \']" name="software_quantity[\' + numberIncr + \']" min="1" max="10" value="1" /></td><td><a href="#" class="remove_field" style="width: 100%;">Remove</a></td></tr>\');
+					numberIncr++;
+				}
+			});
+
+			$(software_wrapper).on("click", ".remove_field", function (e) {
+				e.preventDefault();
+				$(this).closest("tr").remove();
+			});	
+		';
 	}
 }

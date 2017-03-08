@@ -125,4 +125,12 @@ class Apple_ID_Box extends PDQ_Box
 			$validation_errors['apple_id'] = "Apple ID is required";
 		}
 	}
+	
+	public function footer_script()
+	{
+		echo '
+			$("#apple_id_email").rules("add", { required: true, email: true });
+			$("#apple_id_password").rules("add", { required: true });
+		';
+	}
 }

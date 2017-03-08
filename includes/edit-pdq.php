@@ -1,7 +1,8 @@
 <h2>Edit <?php echo $this->pdq_types[$this->current_setup_type]; ?> PDQ</h2>
+<div id="validation-messages" class="notice notice-error"></div>
 <div id="poststuff">
 	<div id="post-body" class="metabox-holder columns-2">
-		<form method="post" action="">
+		<form id="pdq-form" method="post" action="">
 			<div id="postbox-container-1" class='postbox-container'>
 					<input name="action" type="hidden" value="update_pdq" />
 					<input name="setup_type" type="hidden" value="<?php echo $this->current_setup_type; ?>" />

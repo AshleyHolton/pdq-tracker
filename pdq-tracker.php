@@ -58,6 +58,29 @@ class PDQ_Tracker
 		add_action("admin_enqueue_scripts", array(&$this, 'admin_scripts'));
 		
 		add_action('admin_notices', array(&$this, 'admin_notices'));
+		
+		add_action('admin_print_footer_scripts', array(&$this, 'admin_validation_scripts'));
+	}
+	
+	public function admin_validation_scripts()
+	{
+		echo "<script type='text/javascript'>\n";
+		echo "jQuery(document).ready(function($){\n";
+		
+		foreach($this->pdq_boxes as $box)
+		{
+			if(in_array($this->current_setup_type, $box->setup_types))
+			{
+				/*foreach($box->validation_rules as $rulename => $rule)
+				{
+					echo "$('#" . $rulename . "').rules('add', " . json_encode($rule) . ");\n";
+				}*/
+				
+				$box->footer_script();
+			}
+		}
+		
+		echo "});\n</script>";
 	}
 	
 	public function additional_plugin_setup()
@@ -83,9 +106,14 @@ class PDQ_Tracker
 	{
 		wp_enqueue_script('jquery-ui-datepicker');
 		wp_register_style('jquery-ui', plugins_url("/css/jquery-ui.css", __FILE__));
-		wp_enqueue_style('jquery-ui');  
+		wp_enqueue_style('jquery-ui');
+		
+		wp_enqueue_script('jquery-validate', plugins_url("/js/jquery.validate.min.js", __FILE__), array(), false, true);
 		
 		wp_enqueue_script('pdq-main', plugins_url("/js/pdq-main$this->minify.js", __FILE__), array(), false, true);
+		
+		wp_register_style('admin', plugins_url("/css/admin.css", __FILE__));
+		wp_enqueue_style('admin');
 	}
 	
 	public function create_pdq_database()
