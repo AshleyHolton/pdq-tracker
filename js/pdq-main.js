@@ -23,6 +23,28 @@ jQuery(document).ready(function($)
 		}
 	});
 	
+	$.validator.addMethod("receipt", function(value, element, param){
+		
+		if(value.length == 6)
+		{
+			if($.isNumeric(value))
+			{
+				return true;
+			}
+		}
+		else if(value.length == 13)
+		{
+			var re = new RegExp("^(CUR|PCW)[0-9]{10}$");
+			
+			console.log(re.test(value));
+			
+			return re.test(value);
+		}
+		
+		return false;
+		
+	}, $.validator.format("Please enter a valid receipt number."));
+	
 	
 	//Remove Meta Box Interactions
     $('.postbox .hndle').css('cursor', 'pointer');

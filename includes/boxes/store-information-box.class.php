@@ -8,7 +8,7 @@ class Store_Information_Box extends PDQ_Box
 	public $print_priority = 10;
 	public $setup_types = array('windows', 'mac', 'ipad', 'android');
 	public $side = true;
-	public $table_data = array("receipt_number VARCHAR(6) NOT NULL DEFAULT '0'", "items_left LONGTEXT NOT NULL", "item_order_type VARCHAR(20) NOT NULL DEFAULT 'not_ordered'");
+	public $table_data = array("receipt_number VARCHAR(13) NOT NULL DEFAULT '0'", "items_left LONGTEXT NOT NULL", "item_order_type VARCHAR(20) NOT NULL DEFAULT 'not_ordered'");
 	
 	public $item_order_types = array('not_ordered' => 'Not Ordered', 'medics' => 'Medics', 'pay_and_collect' => 'Pay & Collect');
 	
@@ -38,7 +38,7 @@ class Store_Information_Box extends PDQ_Box
 ?>
 		<p><b>Date Created:</b> <?php echo date(get_option('date_format'), strtotime($date_created)); ?></p>
 		<p><b>Sales Colleague:</b> <?php echo $colleague->first_name . ' ' . $colleague->last_name; ?></p>
-		<p><b>Receipt Number *</b>: <input type="text" name="receipt_number" id="receipt_number" value="<?php echo $receipt_number; ?>" /></p>
+		<p><b>Receipt/P&C No. *</b>: <input type="text" name="receipt_number" id="receipt_number" value="<?php echo $receipt_number; ?>" /></p>
 
 		<p><b>Estimated Completion Time:</b> <?php echo $est_completion_time; ?> days</p>
 		<hr />
@@ -107,7 +107,7 @@ class Store_Information_Box extends PDQ_Box
 		<table>
 			<tr>
 				<th>Colleague Name</th>
-				<th>Receipt Number</th>
+				<th>Receipt/P&C No.</th>
 				<th>Date of Purchase</th>
 				<th>Estimated Completion Time</th>
 			</tr>
@@ -152,10 +152,26 @@ class Store_Information_Box extends PDQ_Box
 		//Receipt Number
 		$receipt_number = esc_html($_POST['receipt_number']);
 		
-		if(strlen($receipt_number) != 6 || !is_numeric($receipt_number))
+		$error = true;
+		
+		if(strlen($receipt_number) == 6)
 		{
-			$validation_errors['receipt_number'] = "Invalid Receipt Number";
+			if(is_numeric($receipt_number))
+			{
+				$error = false;
+			}
 		}
+		else if(strlen($receipt_number) == 13)
+		{
+			if(count(preg_grep("/^(CUR|PCW)[0-9]{10}$/", explode("\n" ,$receipt_number))) == 1)
+			{
+				$error = false;
+			}
+		}
+		
+		if($error) $validation_errors['receipt_number'] = "Invalid Receipt Number";
+		
+		
 		
 		$newdata['receipt_number'] = $receipt_number;
 		
@@ -177,7 +193,7 @@ class Store_Information_Box extends PDQ_Box
 	
 	public function footer_script()
 	{
-		echo '$("#receipt_number").rules("add", {"minlength": 6, "maxlength": 6, "required": true, "number": true});';
+		echo '$("#receipt_number").rules("add", {receipt: true});';
 		echo '$.validator.addClassRules("left-item", { required: true });';
 		
 		echo '

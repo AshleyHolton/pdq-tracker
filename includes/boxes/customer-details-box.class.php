@@ -115,7 +115,7 @@ class Customer_Details_Box extends PDQ_Box
 		echo '$("#customer_name").rules("add", {"minlength": 6, "required": true});';
 		echo '$("#customer_address").rules("add", {"minlength": 6, "required": true});';
 		echo '$("#customer_telephone").rules("add", {"minlength": 6, "required": true, "number": true});';
-		echo '$("#customer_dob").rules("add", {"required": true, "date": true});';
+		echo '$("#customer_dob").rules("add", {"required": true, "dateBR": true});';
 		
 		echo '$("#customer_dob").datepicker({
 				dateFormat: "dd-mm-yy",

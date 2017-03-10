@@ -20,18 +20,18 @@ class Save_PDQ_Box extends PDQ_Box
 
 			if(isset($pdq->status) && $pdq->status !== 'complete')
 			{
-				submit_button('Save PDQ', 'primary', 'save_pdq', false);
-				echo sprintf('<a href="%s&action=%s&pdq=%s" id="%3$s" class="button">%s</a>', wp_nonce_url(admin_url('admin.php?page=pdq-tracker'), 'complete-pdq-' . $pdq->id), 'complete_pdq', $pdq->id, 'Complete');
+				echo '<input type="submit" name="save_pdq" id="save_pdq" class="button primary" value="Save PDQ" onclick="return confirm(\'Are you sure?\')" />';
+				echo sprintf('<a href="%s&action=%s&pdq=%s" id="%3$s" class="button" onclick="return confirm(\'Are you sure?\')">%s</a>', wp_nonce_url(admin_url('admin.php?page=pdq-tracker'), 'complete-pdq-' . $pdq->id), 'complete_pdq', $pdq->id, 'Complete');
 			}
 			else
 			{
-				echo sprintf('<a href="%s&action=%s&pdq=%s" id="%3$s" class="button">%s</a>', wp_nonce_url(admin_url('admin.php?page=pdq-tracker'), 'incomplete-pdq-' . $pdq->id), 'incomplete_pdq', $pdq->id, 'Edit');
+				echo sprintf('<a href="%s&action=%s&pdq=%s" id="%3$s" class="button" onclick="return confirm(\'Are you sure?\')">%s</a>', wp_nonce_url(admin_url('admin.php?page=pdq-tracker'), 'incomplete-pdq-' . $pdq->id), 'incomplete_pdq', $pdq->id, 'Edit');
 				echo sprintf('<a href="%s&action=%s&pdq=%s" id="%3$s" class="button" onclick="return confirm(\'Are you sure?\')">%s</a>', wp_nonce_url(admin_url('admin.php?page=pdq-tracker'), 'delete-pdq-' . $pdq->id), 'delete_pdq', $pdq->id, 'Delete');
 			}
 		}
 		else
 		{
-			submit_button('Save PDQ', 'primary', 'save_pdq', false);
+			echo '<input type="submit" name="save_pdq" id="save_pdq" class="button primary" value="Save PDQ" onclick="return confirm(\'Are you sure?\')" />';
 		}
 	}
 	
