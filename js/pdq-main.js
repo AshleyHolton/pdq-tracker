@@ -24,23 +24,18 @@ jQuery(document).ready(function($)
 	});
 	
 	$.validator.addMethod("receipt", function(value, element, param){
-		
-		if(value.length == 6)
-		{
-			if($.isNumeric(value))
-			{
-				return true;
-			}
-		}
-		else if(value.length == 13)
+		console.log(param);
+		if((param == "pay_and_collect") && (value.length == 13))
 		{
 			var re = new RegExp("^(CUR|PCW)[0-9]{10}$");
 			
-			console.log(re.test(value));
-			
 			return re.test(value);
 		}
-		
+		else if((value.length == 6) && ($.isNumeric(value)) && (param != "pay_and_collect"))
+		{
+			return true;
+		}
+
 		return false;
 		
 	}, $.validator.format("Please enter a valid receipt number."));

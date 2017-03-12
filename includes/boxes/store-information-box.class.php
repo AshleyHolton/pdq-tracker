@@ -14,13 +14,24 @@ class Store_Information_Box extends PDQ_Box
 	
 	public function meta_box($pdq)
 	{
+		$date_collected = isset($pdq->collected_) ? $pdq->collected_on : date('Y-m-d H:i:s');
+
+		$collected_by = isset($pdq->collected_by) ? get_user_by('id', $pdq->collected_by) : wp_get_current_user();
+		
+		if(isset($pdq->status) && $pdq->status == 'collected')
+		{
+			echo '<p><b>Date Collected:</b> ' . date('jS F Y G:i', strtotime($date_collected)) . '</p>
+				<p><b>Collected From:</b> ' . $collected_by->first_name . ' ' . $collected_by->last_name . '</p>
+				<hr />';
+		}
+		
 		$date_completed = isset($pdq->completed_on) ? $pdq->completed_on : date('Y-m-d H:i:s');
 
 		$completed_by = isset($pdq->completed_by) ? get_user_by('id', $pdq->completed_by) : wp_get_current_user();
 		
-		if(isset($pdq->status) && $pdq->status == 'complete')
+		if(isset($pdq->status) && $pdq->status != 'incomplete')
 		{
-			echo '<p><b>Date Completed:</b> ' . date(get_option('date_format'), strtotime($date_completed)) . '</p>
+			echo '<p><b>Date Completed:</b> ' . date('jS F Y G:i', strtotime($date_completed)) . '</p>
 				<p><b>Completed By:</b> ' . $completed_by->first_name . ' ' . $completed_by->last_name . '</p>
 				<hr />';
 		}
@@ -36,7 +47,7 @@ class Store_Information_Box extends PDQ_Box
 		$item_order_type = isset($pdq->item_order_type) ? $pdq->item_order_type : '';
 
 ?>
-		<p><b>Date Created:</b> <?php echo date(get_option('date_format'), strtotime($date_created)); ?></p>
+		<p><b>Date Created:</b> <?php echo date('jS F Y G:i', strtotime($date_created)); ?></p>
 		<p><b>Sales Colleague:</b> <?php echo $colleague->first_name . ' ' . $colleague->last_name; ?></p>
 		<p><b>Receipt/P&C No. *</b>: <input type="text" name="receipt_number" id="receipt_number" value="<?php echo $receipt_number; ?>" /></p>
 
@@ -149,32 +160,6 @@ class Store_Information_Box extends PDQ_Box
 	
 	public function save_box(&$newdata, &$validation_errors)
 	{
-		//Receipt Number
-		$receipt_number = esc_html($_POST['receipt_number']);
-		
-		$error = true;
-		
-		if(strlen($receipt_number) == 6)
-		{
-			if(is_numeric($receipt_number))
-			{
-				$error = false;
-			}
-		}
-		else if(strlen($receipt_number) == 13)
-		{
-			if(count(preg_grep("/^(CUR|PCW)[0-9]{10}$/", explode("\n" ,$receipt_number))) == 1)
-			{
-				$error = false;
-			}
-		}
-		
-		if($error) $validation_errors['receipt_number'] = "Invalid Receipt Number";
-		
-		
-		
-		$newdata['receipt_number'] = $receipt_number;
-		
 		//Item Order Type
 		$item_order_type = isset($_POST['item_order_type']) ? esc_html($_POST['item_order_type']) : 'not_ordered';
 		
@@ -184,6 +169,30 @@ class Store_Information_Box extends PDQ_Box
 		}
 		
 		$newdata['item_order_type'] = $item_order_type;
+		
+		//Receipt Number
+		$receipt_number = esc_html($_POST['receipt_number']);
+		
+		$error = true;
+		
+		if($item_order_type == 'pay_and_collect')
+		{
+			if(strlen($receipt_number) == 13 && count(preg_grep("/^(CUR|PCW)[0-9]{10}$/", explode("\n" ,$receipt_number))) == 1)
+			{
+				$error = false;
+			}
+		}
+		else
+		{
+			if(strlen($receipt_number) == 6 && is_numeric($receipt_number))
+			{
+				$error = false;
+			}
+		}
+		
+		if($error) $validation_errors['receipt_number'] = "Invalid Receipt Number";		
+		
+		$newdata['receipt_number'] = $receipt_number;
 
 		//Items Left Behind
 		$items_left_behind = isset($_POST['left_item']) ? json_encode(array_map('esc_html', $_POST['left_item'])) : json_encode(array());
@@ -192,8 +201,11 @@ class Store_Information_Box extends PDQ_Box
 	}
 	
 	public function footer_script()
-	{
-		echo '$("#receipt_number").rules("add", {receipt: true});';
+	{		
+		echo '$("#receipt_number").rules("add", {"receipt": function(element){
+				return $("#item_order_type").find(":selected").val();
+		}});';
+		
 		echo '$.validator.addClassRules("left-item", { required: true });';
 		
 		echo '

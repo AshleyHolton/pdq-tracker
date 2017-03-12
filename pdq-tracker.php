@@ -13,6 +13,7 @@ define('PDQ_DEBUG', true);
 
 $GLOBALS['pdq_tracker']  = new PDQ_Tracker();
 
+//Statuses: incomplete, complete, collected
 class PDQ_Tracker
 {
 	protected $pdq_database_version = '0.0.1';
@@ -28,7 +29,9 @@ class PDQ_Tracker
 	
 	public $current_setup_type = '';
 	
-	public $manage_pdqs_capability = 'publish_posts';
+	public $manage_pdqs_capability = 'publish_posts'; //PDQ_MANAGE
+	public $manage_settings_capability = 'publish_posts'; //PDQ_EDIT_SETTINGS
+	public $approve_showhow_capability = 'publish_posts'; //PDQ_SH_Approve
 	
 	public function __construct()
 	{
@@ -49,6 +52,7 @@ class PDQ_Tracker
 		add_action('current_screen', array(&$this, 'delete_pdq'));
 		add_action('current_screen', array(&$this, 'complete_pdq'));
 		add_action('current_screen', array(&$this, 'incomplete_pdq'));
+		add_action('current_screen', array(&$this, 'collect_pdq'));
 		add_action('current_screen', array(&$this, 'update_settings'));
 		add_action('current_screen', array(&$this, 'register_pdq_list'));
 		
@@ -144,6 +148,8 @@ class PDQ_Tracker
 				status VARCHAR(10) NOT NULL DEFAULT 'incomplete',
 				completed_on DATETIME NOT NULL,
 				completed_by BIGINT(20) NOT NULL,
+				collected_on DATETIME NOT NULL,
+				collected_by BIGINT(20) NOT NULL,
 				" . $pdq_box_sql . "PRIMARY KEY  (id)
 				) DEFAULT CHARACTER SET $charset COLLATE $collate;";
 
@@ -390,7 +396,50 @@ class PDQ_Tracker
 		
 		$newdata['completed_by'] = '';
 		$newdata['completed_on'] = '';
+		$newdata['collected_by'] = '';
+		$newdata['collected_on'] = '';
 		$newdata['status'] = 'incomplete';
+		
+		//Push To Database
+		if($wpdb->update($this->pdq_table, $newdata, array('id' => $id)))
+		{
+			wp_redirect('admin.php?page=pdq-tracker&action=edit&pdq=' . $id);
+		
+			exit();
+		}
+	}
+	
+	public function collect_pdq()
+	{
+		global $wpdb;
+
+		if(!isset($_GET['action']) || !isset($_GET['page']))
+		{
+			return;
+		}
+
+		if('pdq-tracker' !== $_GET['page'])
+		{
+			return;
+		}
+
+		if('collect_pdq' !== $_GET['action'])
+		{
+			return;
+		}
+
+		$id = absint($_GET['pdq']);
+
+		check_admin_referer('collect-pdq-' . $id);
+		
+		$newdata = array();
+		
+		$colleague_id = wp_get_current_user()->ID;
+		$collected_on = date('Y-m-d H:i:s');
+		
+		$newdata['collected_by'] = $colleague_id;
+		$newdata['collected_on'] = $collected_on;
+		$newdata['status'] = 'collected';
 		
 		//Push To Database
 		if($wpdb->update($this->pdq_table, $newdata, array('id' => $id)))

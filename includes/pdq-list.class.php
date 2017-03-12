@@ -47,10 +47,11 @@ class PDQ_Entries_List extends WP_List_Table
 	{
 		switch($item['urgency'])
 		{
-			case 0: $color = '#ff0000'; break;
-			case 1: $color = '#ffcc00'; break;
-			case 2: $color = '#00ff00'; break;
-			case 3: $color = '#cccccc'; break;
+			case 0: $color = '#ff0000'; break; //Red Overdue
+			case 1: $color = '#ffcc00'; break; //Amber Due Today
+			case 2: $color = '#00ff00'; break; //Green Not Due
+			case 3: $color = '#cccccc'; break; //Grey Complete
+			case 4: $color = '#007fff'; break; //Blue Ordered
 		}
 		
 		return '<div style="background: ' . $color . '; width: 40px; height: 40px;"></div>';
