@@ -163,7 +163,7 @@ class PDQ_Entries_List extends WP_List_Table
 				
 			$expected_completion_date = $purchase_date->add($duration);
 			
-			if($pdq->status != 'complete')
+			if($pdq->status == 'incomplete')
 			{
 				if($expected_completion_date > $now)
 				{
@@ -178,9 +178,17 @@ class PDQ_Entries_List extends WP_List_Table
 					$pdq->urgency = '1';
 				}
 			}
-			else
+			else if($pdq->status == 'complete')
 			{
 				$pdq->urgency = '3';
+			}
+			else if($pdq->status == 'collected')
+			{
+				$pdq->urgency = '4';
+			}
+			else if($pdq->status == 'ordered')
+			{
+				$pdq->urgency = '5';
 			}
 		}
 		

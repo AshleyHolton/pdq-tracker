@@ -2,7 +2,7 @@
 
 /*
 Plugin Name: 	PDQ Tracker
-Plugin URI:		https://bitbucket.org/AshleyHolton/pdq-tracker/
+Plugin URI:		https://github.com/AshleyHolton/pdq-tracker/
 Description: 	Create and track setup PDQs
 Version: 		0.0.6
 Author:			Ashley Holton
@@ -13,7 +13,7 @@ define('PDQ_DEBUG', true);
 
 $GLOBALS['pdq_tracker']  = new PDQ_Tracker();
 
-//Statuses: incomplete, complete, collected
+//Statuses: ordered, incomplete, complete, collected
 class PDQ_Tracker
 {
 	protected $pdq_database_version = '0.0.1';
@@ -535,6 +535,8 @@ class PDQ_Tracker
 		{
 			add_submenu_page('pdq-tracker', 'PDQ Tracker', 'New ' . $this->pdq_types[$type] . ' PDQ', $this->manage_pdqs_capability, 'pdq-tracker&action=add&type=' . $type, array(&$this, 'admin_main_page'));
 		}
+		
+		add_submenu_page('pdq-tracker', 'PDQ Tracker', 'Ordered Report', $this->manage_pdqs_capability, 'pdq-tracker', array(&$this, 'admin_main_page'));
 
 		$this->pdq_admin_pages['pdq-settings'] = add_options_page('PDQ Settings', 'PDQ Settings', $this->manage_settings_capability, 'pdq-settings', array(&$this, 'admin_settings_page'));
 	}
