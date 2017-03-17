@@ -4,7 +4,7 @@
 Plugin Name: 	PDQ Tracker
 Plugin URI:		https://bitbucket.org/AshleyHolton/pdq-tracker/
 Description: 	Create and track setup PDQs
-Version: 		0.0.5
+Version: 		0.0.6
 Author:			Ashley Holton
 Author URI: 	http://www.ashleyholton.co.uk
 */
@@ -99,10 +99,14 @@ class PDQ_Tracker
 		
 		if(class_exists('User_Role_Editor'))
 		{
-			$this->manage_pdqs_capability = 'manage_pdqs';
+			$this->manage_pdqs_capability = 'PDQ_MANAGE';
+			$this->manage_settings_capability = 'PDQ_EDIT_SETTINGS';
+			$this->approve_showhow_capability = 'PDQ_SH_Approve';
 			
 			$main_roles = new WP_Roles();
 			$main_roles->add_cap('administrator', $this->manage_pdqs_capability);
+			$main_roles->add_cap('administrator', $this->manage_settings_capability);
+			$main_roles->add_cap('administrator', $this->approve_showhow_capability);
 		}
 	}
 	
