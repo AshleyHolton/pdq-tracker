@@ -12,9 +12,11 @@ class ShowHow_Box extends PDQ_Box
 	
 	public function meta_box($pdq)
 	{
+		global $pdq_tracker;
+		
 		$showhow_date = '';
 		$showhow_time = '';
-		
+			
 		if(isset($pdq->showhow))
 		{			
 			if($pdq->showhow != '0000-00-00 00:00:00')
@@ -23,11 +25,22 @@ class ShowHow_Box extends PDQ_Box
 				$showhow_time = date('h:i A', strtotime($pdq->showhow));
 			}
 		}
-		
-		?>
-			<p><b>Booked Date:</b><input type="text" name="showhow_date" id="showhow_date" value="<?php echo $showhow_date; ?>" /></p>
-			<p><b>Booked Time:</b><input type="text" name="showhow_time" id="showhow_time" value="<?php echo $showhow_time; ?>" /></p>
-		<?php
+			
+		if(current_user_can($pdq_tracker->approve_showhow_capability))
+		{
+			?>
+				<p><b>Booked Date:</b><input type="text" name="showhow_date" id="showhow_date" value="<?php echo $showhow_date; ?>" /></p>
+				<p><b>Booked Time:</b><input type="text" name="showhow_time" id="showhow_time" value="<?php echo $showhow_time; ?>" /></p>
+			<?php
+		}
+		else
+		{
+			?>
+				<p>Only KnowHow colleagues can ammed bookings.</p>
+				<p><b>Booked Date: </b><?php echo $showhow_date; ?></p>
+				<p><b>Booked Time: </b><?php echo $showhow_time; ?></p>
+			<?php
+		}
 	}
 	
 	protected function print_box($pdq)

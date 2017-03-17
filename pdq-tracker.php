@@ -536,7 +536,7 @@ class PDQ_Tracker
 			add_submenu_page('pdq-tracker', 'PDQ Tracker', 'New ' . $this->pdq_types[$type] . ' PDQ', $this->manage_pdqs_capability, 'pdq-tracker&action=add&type=' . $type, array(&$this, 'admin_main_page'));
 		}
 
-		$this->pdq_admin_pages['pdq-settings'] = add_options_page('PDQ Settings', 'PDQ Settings', 'manage_options', 'pdq-settings', array(&$this, 'admin_settings_page'));
+		$this->pdq_admin_pages['pdq-settings'] = add_options_page('PDQ Settings', 'PDQ Settings', $this->manage_settings_capability, 'pdq-settings', array(&$this, 'admin_settings_page'));
 	}
 	
 	public function admin_settings_page()
