@@ -55,17 +55,17 @@ function add_default_pdq_boxes()
 	require_once(trailingslashit(plugin_dir_path(__FILE__)) . 'boxes/colleague-notes-box.class.php');
 	require_once(trailingslashit(plugin_dir_path(__FILE__)) . 'boxes/apple-id-box.class.php');
 	
-	$pdq_tracker->add_pdq_box(new Save_PDQ_Box());
-	$pdq_tracker->add_pdq_box(new Store_Information_Box());
-	$pdq_tracker->add_pdq_box(new Customer_Details_Box());
-	$pdq_tracker->add_pdq_box(new Customer_Emails_Box());
-	$pdq_tracker->add_pdq_box(new Software_Box());
-	$pdq_tracker->add_pdq_box(new Recovery_Media_Box());
-	$pdq_tracker->add_pdq_box(new Data_Transfer_Box());
-	$pdq_tracker->add_pdq_box(new ShowHow_Box());
-	$pdq_tracker->add_pdq_box(new Blancco_Box());
-	$pdq_tracker->add_pdq_box(new Colleague_Notes_Box());
-	$pdq_tracker->add_pdq_box(new Apple_ID_Box());
+	$pdq_tracker->add_pdq_box('save-pdq', new Save_PDQ_Box());
+	$pdq_tracker->add_pdq_box('store-information', new Store_Information_Box());
+	$pdq_tracker->add_pdq_box('customer-details', new Customer_Details_Box());
+	$pdq_tracker->add_pdq_box('customer-emails', new Customer_Emails_Box());
+	$pdq_tracker->add_pdq_box('software', new Software_Box());
+	$pdq_tracker->add_pdq_box('recovery-media', new Recovery_Media_Box());
+	$pdq_tracker->add_pdq_box('data-transfer', new Data_Transfer_Box());
+	$pdq_tracker->add_pdq_box('showhow', new ShowHow_Box());
+	$pdq_tracker->add_pdq_box('blancco', new Blancco_Box());
+	$pdq_tracker->add_pdq_box('colleague-notes', new Colleague_Notes_Box());
+	$pdq_tracker->add_pdq_box('apple-id', new Apple_ID_Box());
 }
 
 add_action('add_pdq_boxes', 'add_default_pdq_boxes');

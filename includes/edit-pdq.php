@@ -5,6 +5,7 @@
 		<form id="pdq-form" method="post" action="">
 			<div id="postbox-container-1" class='postbox-container'>
 					<input name="action" type="hidden" value="update_pdq" />
+					<input name="status" type="hidden" value="<?php echo $pdq->status; ?>" />
 					<input name="setup_type" type="hidden" value="<?php echo $this->current_setup_type; ?>" />
 					<input name="pdq_id" type="hidden" value="<?php echo $edit_pdq_id; ?>" />
 					<?php

@@ -22,6 +22,7 @@ class Data_Transfer_Box extends PDQ_Box
 			}
 		}
 		?>
+			<p>063323 - £35</p>
 			<p><b>Password:</b><input type="text" name="data_transfer" id="data_transfer" value="<?php echo $dt_password; ?>" /></p>
 		<?php
 	}

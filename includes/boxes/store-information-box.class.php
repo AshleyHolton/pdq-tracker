@@ -29,7 +29,7 @@ class Store_Information_Box extends PDQ_Box
 
 		$completed_by = isset($pdq->completed_by) ? get_user_by('id', $pdq->completed_by) : wp_get_current_user();
 		
-		if(isset($pdq->status) && $pdq->status != 'incomplete')
+		if(isset($pdq->status) && ($pdq->status == 'complete' || $pdq->status == 'collected'))
 		{
 			echo '<p><b>Date Completed:</b> ' . date('jS F Y G:i', strtotime($date_completed)) . '</p>
 				<p><b>Completed By:</b> ' . $completed_by->first_name . ' ' . $completed_by->last_name . '</p>
@@ -160,12 +160,29 @@ class Store_Information_Box extends PDQ_Box
 	
 	public function save_box(&$newdata, &$validation_errors)
 	{
+		$newdata['status'] = 'incomplete';
+		
 		//Item Order Type
 		$item_order_type = isset($_POST['item_order_type']) ? esc_html($_POST['item_order_type']) : 'not_ordered';
 		
 		if(!array_key_exists($item_order_type, $this->item_order_types))
 		{
 			$item_order_type = 'not_ordered';
+		}
+		
+		if($item_order_type != 'not_ordered')
+		{
+			if($_POST['action'] == 'create_pdq')
+			{
+				$newdata['status'] = 'ordered';
+			}
+			else if($_POST['action'] == 'update_pdq')
+			{
+				if($_POST['status'] && $_POST['status'] == 'ordered')
+				{
+					$newdata['status'] = 'ordered';
+				}
+			}
 		}
 		
 		$newdata['item_order_type'] = $item_order_type;

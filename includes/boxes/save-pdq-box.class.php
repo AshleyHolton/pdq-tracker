@@ -12,6 +12,8 @@ class Save_PDQ_Box extends PDQ_Box
 	
 	public function meta_box($pdq)
 	{
+		global $pdq_tracker;
+		
 		echo "<p>Don't forget to save the PDQ after editing.</p>";
 		
 		if($pdq)
@@ -26,8 +28,12 @@ class Save_PDQ_Box extends PDQ_Box
 			else if(isset($pdq->status) && $pdq->status == 'complete')
 			{
 				echo sprintf('<a href="%s&action=%s&pdq=%s" id="%3$s" class="button" onclick="return confirm(\'Are you sure?\')">%s</a>', wp_nonce_url(admin_url('admin.php?page=pdq-tracker'), 'incomplete-pdq-' . $pdq->id), 'incomplete_pdq', $pdq->id, 'Reopen');
-				echo sprintf('<a href="%s&action=%s&pdq=%s" id="%3$s" class="button" onclick="return confirm(\'Are you sure?\')">%s</a>', wp_nonce_url(admin_url('admin.php?page=pdq-tracker'), 'collect-pdq-' . $pdq->id), 'collect_pdq', $pdq->id, 'Collect');
+				if(current_user_can($pdq_tracker->collect_setup_capability)) echo sprintf('<a href="%s&action=%s&pdq=%s" id="%3$s" class="button" onclick="return confirm(\'Are you sure?\')">%s</a>', wp_nonce_url(admin_url('admin.php?page=pdq-tracker'), 'collect-pdq-' . $pdq->id), 'collect_pdq', $pdq->id, 'Collect');
 				echo sprintf('<a href="%s&action=%s&pdq=%s" id="%3$s" class="button" onclick="return confirm(\'Are you sure?\')">%s</a>', wp_nonce_url(admin_url('admin.php?page=pdq-tracker'), 'delete-pdq-' . $pdq->id), 'delete_pdq', $pdq->id, 'Delete');
+			}
+			else if(isset($pdq->status) && $pdq->status == 'ordered')
+			{
+				echo sprintf('<a href="%s&action=%s&pdq=%s" id="%3$s" class="button" onclick="return confirm(\'Are you sure?\')">%s</a>', wp_nonce_url(admin_url('admin.php?page=pdq-tracker'), 'incomplete-pdq-' . $pdq->id), 'incomplete_pdq', $pdq->id, 'Arrived');
 			}
 			else
 			{

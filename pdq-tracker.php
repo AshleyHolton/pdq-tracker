@@ -9,6 +9,8 @@ Author:			Ashley Holton
 Author URI: 	http://www.ashleyholton.co.uk
 */
 
+require_once(trailingslashit(plugin_dir_path(__FILE__)) . 'includes/helpers.class.php');
+
 define('PDQ_DEBUG', true);
 
 $GLOBALS['pdq_tracker']  = new PDQ_Tracker();
@@ -32,6 +34,8 @@ class PDQ_Tracker
 	public $manage_pdqs_capability = 'publish_posts'; //PDQ_MANAGE
 	public $manage_settings_capability = 'publish_posts'; //PDQ_EDIT_SETTINGS
 	public $approve_showhow_capability = 'publish_posts'; //PDQ_SH_Approve
+	public $collect_setup_capability = 'publish_posts'; //PDQ_COLLECT_SETUP
+	public $update_database_capability = 'publish_posts'; //PDQ_UPDATE_DB
 	
 	public function __construct()
 	{
@@ -46,6 +50,7 @@ class PDQ_Tracker
 
 		$this->pdq_table = $wpdb->prefix . 'pdq_entries';
 		
+		add_action('current_screen', array(&$this, 'purge_pdqs'));
 		add_action('current_screen', array(&$this, 'register_pdq_boxes'));
 		add_action('current_screen', array(&$this, 'add_pdq'));
 		add_action('current_screen', array(&$this, 'update_pdq'));
@@ -74,12 +79,7 @@ class PDQ_Tracker
 		foreach($this->pdq_boxes as $box)
 		{
 			if(in_array($this->current_setup_type, $box->setup_types))
-			{
-				/*foreach($box->validation_rules as $rulename => $rule)
-				{
-					echo "$('#" . $rulename . "').rules('add', " . json_encode($rule) . ");\n";
-				}*/
-				
+			{				
 				$box->footer_script();
 			}
 		}
@@ -102,11 +102,15 @@ class PDQ_Tracker
 			$this->manage_pdqs_capability = 'PDQ_MANAGE';
 			$this->manage_settings_capability = 'PDQ_EDIT_SETTINGS';
 			$this->approve_showhow_capability = 'PDQ_SH_Approve';
+			$this->collect_setup_capability = 'PDQ_COLLECT_SETUP';
+			$this->update_database_capability = 'PDQ_UPDATE_DB';
 			
 			$main_roles = new WP_Roles();
 			$main_roles->add_cap('administrator', $this->manage_pdqs_capability);
 			$main_roles->add_cap('administrator', $this->manage_settings_capability);
 			$main_roles->add_cap('administrator', $this->approve_showhow_capability);
+			$main_roles->add_cap('administrator', $this->collect_setup_capability);
+			$main_roles->add_cap('administrator', $this->update_database_capability);
 		}
 	}
 	
@@ -156,8 +160,14 @@ class PDQ_Tracker
 				collected_by BIGINT(20) NOT NULL,
 				" . $pdq_box_sql . "PRIMARY KEY  (id)
 				) DEFAULT CHARACTER SET $charset COLLATE $collate;";
-
-		dbDelta($pdq_sql);
+				
+		$hash = sha1($pdq_sql);
+				
+		if(get_option('pdq_database_hash') != $hash)
+		{
+			dbDelta($pdq_sql);
+			update_option('pdq_database_hash', $hash);
+		}
 	}
 	
 	public function add_pdq()
@@ -477,6 +487,23 @@ class PDQ_Tracker
 		update_option('pdq_estimated_time', $pdq_estimated_time);
 	}
 	
+	public function purge_pdqs()
+	{
+		global $wpdb;
+		
+		$results = $wpdb->get_results("SELECT * FROM $this->pdq_table WHERE status = 'collected'", OBJECT);
+		
+		foreach($results as $pdq)
+		{
+			$diff = Helpers::date_difference($pdq->collected_on, date("Y-m-d H:i:s"));
+			
+			if($diff >= 30)
+			{
+				$wpdb->query($wpdb->prepare("DELETE FROM $this->pdq_table WHERE id = %d", $pdq->id));
+			}
+		}
+	}
+	
 	public function register_pdq_list()
 	{
 		global $pdqs_list;
@@ -508,6 +535,8 @@ class PDQ_Tracker
     	$pdqs_list->display();
 
 		echo '</form>';
+		
+		echo '<br /><a href="?page=pdq-tracker&action=ordered" target="_blank" class="button">Download Order Report</a>';
 ?>
 
 	<?php
@@ -517,12 +546,15 @@ class PDQ_Tracker
 	{
 		do_action('add_pdq_boxes');
 		
-		$this->create_pdq_database();
+		if(current_user_can($this->update_database_capability))
+		{
+			$this->create_pdq_database();
+		}
 	}
 	
-	public function add_pdq_box($object)
+	public function add_pdq_box($slug, $object)
 	{		
-		$this->pdq_boxes[] = $object;
+		$this->pdq_boxes[$slug] = $object;
 	}
 	
 	public function add_admin()
@@ -536,8 +568,6 @@ class PDQ_Tracker
 			add_submenu_page('pdq-tracker', 'PDQ Tracker', 'New ' . $this->pdq_types[$type] . ' PDQ', $this->manage_pdqs_capability, 'pdq-tracker&action=add&type=' . $type, array(&$this, 'admin_main_page'));
 		}
 		
-		add_submenu_page('pdq-tracker', 'PDQ Tracker', 'Ordered Report', $this->manage_pdqs_capability, 'pdq-tracker', array(&$this, 'admin_main_page'));
-
 		$this->pdq_admin_pages['pdq-settings'] = add_options_page('PDQ Settings', 'PDQ Settings', $this->manage_settings_capability, 'pdq-settings', array(&$this, 'admin_settings_page'));
 	}
 	
@@ -645,6 +675,73 @@ class PDQ_Tracker
 												</div>
 												<div style="clear:both;"></div>
 												' . $box_html . '
+											</section>
+										</div>
+									</div>';
+									
+					$print_html = trim(preg_replace('/\s+/', ' ', $print_html)) ;
+					
+					?>
+					
+					<script>
+						jQuery(document).ready(function($)
+						{
+							$('html').html('<?php echo $print_html; ?>');
+						});
+					</script>
+					
+					<?php
+				}
+				else if($action && $action == 'ordered')
+				{
+					$order = sanitize_sql_orderby('id DESC');
+					
+					$pdqs = $wpdb->get_results("SELECT * FROM $this->pdq_table WHERE status = 'ordered' ORDER BY $order");
+
+					if(!$pdqs) :
+						echo '<p><h3 id="no-pdqs">Nothing has been ordered</h3></div>';
+						return;
+					endif;
+					
+					$box_html = '';
+					
+					foreach($pdqs as $pdq)
+					{
+						$colleague = get_user_by('id', $pdq->colleague_id);
+						$colleague_name = $colleague->first_name . ' ' . $colleague->last_name;
+						
+						$box_html .= '<tr>';
+						$box_html .= '<td>' . $pdq->customer_name . '</td>';
+						$box_html .= '<td>' . $pdq->customer_postcode . '</td>';
+						$box_html .= '<td>' . $colleague_name . '</td>';
+						$box_html .= '<td>' . date('d/m/Y', strtotime($pdq->purchase_date)) . '</td>';
+						$box_html .= '<td>' . $this->pdq_boxes['store-information']->item_order_types[$pdq->item_order_type] . '</td>';
+						$box_html .= '</tr>';
+					}
+					
+					$print_html = '<title>PDQ Order List</title>
+									<div id="pre-setup-container">
+										<div id="pre-setup" class="A4">
+											<link rel="stylesheet" href="' . plugins_url("/css/paper.css", __FILE__) . '" type="text/css" />
+											<section class="sheet">
+												<div style="float:left;">
+													<img src="' . plugins_url( '/img/knowhow.png', __FILE__ ) . '" height="48px" style="margin: 0.67em 0;" />
+												</div>
+												<div style="float:right;">
+													<h1><b>PDQ Order List</b></h1>
+													<p>21/03/2017</p>
+												</div>
+												<div style="clear:both;"></div>
+												<table>
+													<tr>
+														<th>Customer Name</th>
+														<th>Customer Postcode</th>
+														<th>Colleague</th>
+														<th>Purchase Date</th>
+														<th>Order Type</th>
+													</tr>
+													' . $box_html . '
+												</table>
 											</section>
 										</div>
 									</div>';

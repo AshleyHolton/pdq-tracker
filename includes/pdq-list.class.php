@@ -43,6 +43,11 @@ class PDQ_Entries_List extends WP_List_Table
 		return sprintf('%1$s %2$s', $customer_name, $this->row_actions($actions));
 	}
 	
+	function column_customer_postcode($item)
+	{
+		return $item['customer_postcode'];
+	}
+	
 	function column_urgency($item)
 	{
 		switch($item['urgency'])
@@ -51,7 +56,8 @@ class PDQ_Entries_List extends WP_List_Table
 			case 1: $color = '#ffcc00'; break; //Amber Due Today
 			case 2: $color = '#00ff00'; break; //Green Not Due
 			case 3: $color = '#cccccc'; break; //Grey Complete
-			case 4: $color = '#007fff'; break; //Blue Ordered
+			case 4: $color = '#007fff'; break; //Blue Collected
+			case 5: $color = '#ff00ff'; break; //Pink Ordered
 		}
 		
 		return '<div style="background: ' . $color . '; width: 40px; height: 40px;"></div>';
@@ -116,6 +122,7 @@ class PDQ_Entries_List extends WP_List_Table
 		$columns = array(
 			'cb' 					=> '<input type="checkbox" />',
 			'customer_name' 		=> 'Customer Name',
+			'customer_postcode' 	=> 'Customer Postcode',
 			'urgency' 				=> 'Urgency',
 			'setup_type'			=> 'Type',
 			'colleague_name'		=> 'Colleague',
@@ -252,11 +259,12 @@ class PDQ_Entries_List extends WP_List_Table
 	function get_sortable_columns()
 	{
 		$sortable_columns = array(
-			'urgency' 		=> array('urgency', false),
-			'id' 			=> array('id', true),
-			'customer_name'	=> array('customer_name', true),
-			'setup_type'	=> array('setup_type', true),
-			'purchase_date' => array('purchase_date', true)
+			'urgency' 			=> array('urgency', false),
+			'id' 				=> array('id', true),
+			'customer_name'		=> array('customer_name', true),
+			'customer_postcode'	=> array('customer_postcode', true),
+			'setup_type'		=> array('setup_type', true),
+			'purchase_date'		=> array('purchase_date', true)
 		);
 
 		return $sortable_columns;
@@ -349,10 +357,11 @@ class PDQ_Entries_List extends WP_List_Table
 
 		$searchand = $search = '';
 		// Loop through search terms and build query
-		foreach($search_terms as $term) {
+		foreach($search_terms as $term)
+		{
 			$term = esc_sql($wpdb->esc_like($term));
 
-			$search .= "{$searchand}((pdqs.customer_name LIKE '%{$term}%') OR (pdqs.setup_type LIKE '%{$term}%'))";
+			$search .= "{$searchand}((pdqs.customer_name LIKE '%{$term}%') OR (pdqs.setup_type LIKE '%{$term}%') OR (pdqs.customer_postcode LIKE '%{$term}%'))";
 			$searchand = ' AND ';
 		}
 
@@ -374,6 +383,7 @@ class PDQ_Entries_List extends WP_List_Table
 				'id' 					=> $pdq->id,
 				'urgency' 				=> $pdq->urgency,
 				'customer_name' 		=> stripslashes($pdq->customer_name),
+				'customer_postcode' 	=> stripslashes($pdq->customer_postcode),
 				'setup_type' 			=> stripslashes($pdq->setup_type),
 				'colleague_id' 			=> stripslashes($pdq->colleague_id),
 				'purchase_date'			=> stripslashes($pdq->purchase_date),

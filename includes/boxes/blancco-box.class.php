@@ -20,6 +20,7 @@ class Blancco_Box extends PDQ_Box
 		}
 		
 		?>
+			<p>155939 - £35</p>
 			<p>Full Data Destruction? <input type="checkbox" name="blancco" id="blancco" <?php echo $checked; ?> value="1" /></p>
 		<?php
 	}
