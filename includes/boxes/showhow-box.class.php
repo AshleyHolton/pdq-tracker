@@ -22,7 +22,7 @@ class ShowHow_Box extends PDQ_Box
 			if($pdq->showhow != '0000-00-00 00:00:00')
 			{
 				$showhow_date = date('d-m-Y', strtotime($pdq->showhow));
-				$showhow_time = date('h:i A', strtotime($pdq->showhow));
+				$showhow_time = date('g:i A', strtotime($pdq->showhow));
 			}
 		}
 			
@@ -53,7 +53,7 @@ class ShowHow_Box extends PDQ_Box
 			if($pdq->showhow != '0000-00-00 00:00:00')
 			{
 				$showhow_date = date('d-m-Y', strtotime($pdq->showhow));
-				$showhow_time = date('h:i A', strtotime($pdq->showhow));
+				$showhow_time = date('g:i A', strtotime($pdq->showhow));
 				
 				?>		
 				<table>

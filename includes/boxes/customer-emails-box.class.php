@@ -24,9 +24,7 @@ class Customer_Emails_Box extends PDQ_Box
 		$customer_creates = array();
 		
 		if($pdq)
-		{
-			$i = 0;
-			
+		{			
 			$emails = json_decode($pdq->customer_email, true);
 			foreach($emails as $email)
 			{
@@ -60,8 +58,6 @@ class Customer_Emails_Box extends PDQ_Box
 					</tr>
 					
 					<?php
-					
-					$i++;
 				}
 			}
 		}

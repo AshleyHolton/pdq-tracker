@@ -44,8 +44,8 @@ class Data_Transfer_Box extends PDQ_Box
 						<th>Complete</th>
 					</tr>
 					<tr>
-						<td><b>Password:</b></td>
-						<td><?php echo $dt_password; ?></td>
+						<td><b>Password: </b><?php echo $dt_password; ?></td>
+						<td></td>
 					</tr>
 				</table>
 				<?php

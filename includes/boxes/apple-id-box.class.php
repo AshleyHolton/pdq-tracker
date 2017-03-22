@@ -95,7 +95,7 @@ class Apple_ID_Box extends PDQ_Box
 			?>
 			<table class="form-table software-table">
 				<tr valign="top">
-					<th>Email Address</th>
+					<th>Apple ID</th>
 					<th>Password</th>
 					<th>Complete</th>
 				</tr>

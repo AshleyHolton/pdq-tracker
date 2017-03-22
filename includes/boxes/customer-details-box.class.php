@@ -61,7 +61,7 @@ class Customer_Details_Box extends PDQ_Box
 			</tr>
 			<tr>
 				<td><b>Address</b></td>
-				<td><?php echo $pdq->customer_address; ?></td>
+				<td><?php echo $pdq->customer_address . ', ' . $pdq->customer_postcode; ?></td>
 			</tr>
 			<tr>
 				<td><b>Telephone Number</b></td>

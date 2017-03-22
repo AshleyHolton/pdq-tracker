@@ -5,7 +5,7 @@ class Store_Information_Box extends PDQ_Box
 	public $slug = 'store-information';
 	public $title = 'Store Information';
 	public $meta_priority = 5;
-	public $print_priority = 10;
+	public $print_priority = 5;
 	public $setup_types = array('windows', 'mac', 'ipad', 'android');
 	public $side = true;
 	public $table_data = array("receipt_number VARCHAR(13) NOT NULL DEFAULT '0'", "items_left LONGTEXT NOT NULL", "item_order_type VARCHAR(20) NOT NULL DEFAULT 'not_ordered'");
