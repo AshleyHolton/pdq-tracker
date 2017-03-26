@@ -19,6 +19,8 @@ class Software_Box extends PDQ_Box
 	{
 		global $pdq_tracker;
 		
+		echo '<table style="display:none;" id="software-entry-template">'. $this->new_software_entry('', 1, '#id') .'</table>';
+		
 		$software_html = '';
 
 		if($pdq)
@@ -29,18 +31,7 @@ class Software_Box extends PDQ_Box
 
 			foreach($softwares as $key => $value)
 			{
-				$software_html .= '
-				<tr valign="top">
-					<td>
-						<input type="text" class="software-name" id="software[' . $i . ']" name="software[' . $i . ']" value="' . $key . '" placeholder="Email Address" />
-					</td>
-					<td>
-						<input type="number" class="software-quantity" id="software_quantity[' . $i . ']" name="software_quantity[' . $i . ']" min="1" max="10" value="' . $value . '" />
-					</td>
-					<td>
-						<a href="#" class="remove_field">Remove</a>
-					</td>
-				</tr>';
+				$software_html .= $this->new_software_entry($key, $value, $i);
 				
 				$i++;
 			}
@@ -53,18 +44,7 @@ class Software_Box extends PDQ_Box
 
 			foreach($meta_defaults as $key)
 			{
-				$software_html .= '
-				<tr valign="top">
-					<td>
-						<input type="text" class="software-name "id="software[' . $i . ']" name="software[' . $i . ']" value="' . $key . '" placeholder="Software Name" />
-					</td>
-					<td>
-						<input type="number" class="software-quantity "id="software_quantity[' . $i . ']" name="software_quantity[' . $i . ']" min="1" max="10" value="1" />
-					</td>
-					<td>
-						<a href="#" class="remove_field">Remove</a>
-					</td>
-				</tr>';
+				$software_html .= $this->new_software_entry($key, 1, $i);
 				
 				$i++;
 			}
@@ -77,6 +57,24 @@ class Software_Box extends PDQ_Box
 			</table>
 			<button class="button add_new_software">Add</button>
 		<?php
+	}
+	
+	private function new_software_entry($name, $value, $id)
+	{
+		$html = '
+		<tr valign="top">
+			<td>
+				<input type="text" class="software-name" id="software[' . $id . ']" name="software[' . $id . ']" value="' . $name . '" placeholder="Software Name" />
+			</td>
+			<td>
+				<input type="number" class="software-quantity" id="software_quantity[' . $id . ']" name="software_quantity[' . $id . ']" min="1" max="10" value="' . $value . '" />
+			</td>
+			<td>
+				<a href="#" class="remove_field">Remove</a>
+			</td>
+		</tr>';
+		
+		return $html;
 	}
 	
 	protected function print_box($pdq)
@@ -122,6 +120,9 @@ class Software_Box extends PDQ_Box
 		
 			$software_names = array_map('esc_html', $_POST['software']);
 			$software_quantities = array_map('esc_html', ($_POST['software_quantity']));
+			
+			unset($software_names['#id']);
+			unset($software_quantities['#id']);
 
 			for($i = 0; $i < count($software_names); $i++)
 			{
@@ -149,17 +150,25 @@ class Software_Box extends PDQ_Box
 			var software_wrapper = $(".software-table");
 			var existing_software = $(".software-table tr").length;
 			var add_software_button = $(".add_new_software");
-			var numberIncr = existing_software;
+			var numberIncrSoftware = existing_software;
 
-			$(add_software_button).click(function (e) {
+			$(add_software_button).click(function(e)
+			{
 				e.preventDefault();
-				if ($(".software-table tr").length < max_software) {
-					$(software_wrapper).append(\'<tr valign="top"><td><input type="text" class="software-name" style="width: 100%;" id="software[\' + numberIncr + \']" name="software[\' + numberIncr + \']" placeholder="Software Name" /></td><td><input type="number" class="software-quantity" style="width: 100%;" id="software_quantity[\' + numberIncr + \']" name="software_quantity[\' + numberIncr + \']" min="1" max="10" value="1" /></td><td><a href="#" class="remove_field" style="width: 100%;">Remove</a></td></tr>\');
-					numberIncr++;
+				if($(".software-table tr").length < max_software)
+				{
+					var new_entry = $("#software-entry-template tr").clone();
+					
+					new_entry.html(new_entry.html().replace(/#id/g, numberIncrSoftware));
+					
+					$(software_wrapper).append(new_entry);
+					
+					numberIncrSoftware++;
 				}
 			});
 
-			$(software_wrapper).on("click", ".remove_field", function (e) {
+			$(software_wrapper).on("click", ".remove_field", function(e)
+			{
 				e.preventDefault();
 				$(this).closest("tr").remove();
 			});	
