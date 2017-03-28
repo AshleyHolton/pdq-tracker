@@ -85,19 +85,11 @@ class Customer_Details_Box extends PDQ_Box
 		$customer_dob = '';
 		
 		$customer_dob_post = isset($_POST['customer_dob']) ? esc_html($_POST['customer_dob']) : '';
+		$customer_dob = date("Y-m-d", strtotime($customer_dob_post));
 		
 		$customer_postcode = esc_html($_POST['customer_postcode']);
 		$customer_postcode = str_replace(' ', '', $customer_postcode);
 		$customer_postcode = strtoupper(wordwrap($customer_postcode, strlen($customer_postcode)-3,' ', true));
-		
-		if($customer_dob_post != '')
-		{		
-			$customer_dob = date("Y-m-d", strtotime($customer_dob_post));
-		}
-		else
-		{
-			$validation_errors['customer_dob'] = "Customer Date of Birth Is Required";
-		}
 		
 		if(empty($customer_name))
 		{
@@ -139,9 +131,9 @@ class Customer_Details_Box extends PDQ_Box
 	{
 		echo '$("#customer_name").rules("add", {"minlength": 6, "required": true});';
 		echo '$("#customer_address").rules("add", {"minlength": 6, "required": true});';
-		echo '$("#customer_postcode").rules("add", {"required": true});';
+		echo '$("#customer_postcode").rules("add", {"required": true, "postcode": true});';
 		echo '$("#customer_telephone").rules("add", {"minlength": 6, "required": true, "number": true});';
-		echo '$("#customer_dob").rules("add", {"required": true, "dateBR": true});';
+		echo '$("#customer_dob").rules("add", {"dateBR": true});';
 		
 		echo '$("#customer_dob").datepicker({
 				dateFormat: "dd-mm-yy",
