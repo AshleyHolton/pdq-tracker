@@ -4,7 +4,7 @@
 Plugin Name: 	PDQ Tracker
 Plugin URI:		https://github.com/AshleyHolton/pdq-tracker/
 Description: 	Create and track setup PDQs
-Version: 		0.0.7
+Version: 		0.0.8
 Author:			Ashley Holton
 Author URI: 	http://www.ashleyholton.co.uk
 */
